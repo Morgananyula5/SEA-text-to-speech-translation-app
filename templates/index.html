@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: linear-gradient(135deg, #007bff, #28a745); /* Shiny and attractive background */
+            color: #fff; /* White text color for better visibility */
+            padding: 20px; /* Add some padding for better readability */
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px; /* Add some space below the heading */
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 10px; /* Add some space below the heading */
+        }
+
+        h3 {
+            font-size: 18px;
+            margin-bottom: 10px; /* Add some space below the heading */
+        }
+
+        h4 {
+            font-size: 14px;
+            margin-bottom: 10px; /* Add some space below the heading */
+        }
+
+        #translation-form {
+            margin-bottom: 20px;
+        }
+
+        #text-input {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #fff; /* Color for input field */
+            border: 1px solid #ccc; /* Border color for input field */
+            border-radius: 5px; /* Add some border radius for better appearance */
+            color: #333; /* Dark text color for better contrast */
+        }
+
+        #dest-lang-select {
+            width: 50%; /* Half of the original width */
+            margin-bottom: 10px;
+            padding: 5px;
+            background-color: #007bff; /* Color for dropdown */
+            color: #fff; /* Text color for dropdown */
+            border: none; /* Remove border for dropdown */
+            cursor: pointer;
+            border-radius: 5px; /* Add some border radius for better appearance */
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px; /* Add some border radius for better appearance */
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        #audio-player {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI TEXT TO SPEECH TRANSLATOR MODEL</h1>
+    <h2>We can translate the following SEA languages: Tagalog to Malay, Malay to Tagalog, and English to both or vice versa.</h2>
+    <h4>Enter a paragraph in Tagalog or Malay, then select one language on the dropdown.
+        Here is an example of a paragraph in Tagalog that you can use as an example : 
+        "Mahal kita nang buong puso ko."
+        "Salamat sa iyong pagmamahal at suporta."
+        "Ang buhay ay maganda kung kasama ka."
+    </h4>
+    
+    <form id="translation-form">
+        <textarea id="text-input" name="text" placeholder="Enter text to translate"></textarea>
+        <h3 id="dropdown-heading">Select a language:</h3> <!-- Added heading for the dropdown -->
+        <select id="dest-lang-select" name="dest_lang">
+            <option value="en">English</option>
+            <option value="tl">Tagalog (Philippines)</option>
+            <option value="ms">Malay (Indonesia, Brunei, Malaysia, and Singapore)</option>
+        </select>
+        <button type="submit">Translate</button>
+    </form>
+
+    <audio id="audio-player" controls>
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        const audioFiles = {};
+
+        function preloadAudio(text, destLang) {
+            fetch("/", {
+                method: "POST",
+                body: new FormData(document.getElementById("translation-form"))
+            })
+            .then(response => response.json())
+            .then(data => {
+                audioFiles[destLang] = data.audio_file;
+                if (document.getElementById("dest-lang-select").value === destLang) {
+                    document.getElementById("audio-player").src = data.audio_file;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const destLangSelect = document.getElementById("dest-lang-select");
+            destLangSelect.addEventListener("change", function() {
+                const destLang = this.value;
+                if (!(destLang in audioFiles)) {
+                    preloadAudio(document.getElementById("text-input").value, destLang);
+                } else {
+                    document.getElementById("audio-player").src = audioFiles[destLang];
+                }
+            });
+        });
+
+        document.getElementById("translation-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch("/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("audio-player").src = data.audio_file;
+                document.getElementById("audio-player").play();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
+
+
+
+
