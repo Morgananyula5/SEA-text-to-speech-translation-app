@@ -6,6 +6,8 @@ For the deployment process, i utilized Render, a platform for hosting web applic
 
 I recommend if the code fails on the website link,you can try deploying through render or pythoneverywhere.
 
+code can still be ran and deployed using vs code, download python extension and install the necessary imports and libraries.
+
 
 website link: Running on http://127.0.0.1:10000
 screenshot link: https://snipboard.io/T9USRC.jpg
